@@ -45,9 +45,10 @@
     The goal is to construct a sparsifier for a fixed $\eps$ with as few edges as possible.
     The following result is due to Bencz\'{u}r and Karger~\cite{BK96}.
     \begin{theorem}
+        \label{benczur_karger}
         Every graph has $\eps$-cut sparsifier with $O(n \log n / \eps^2)$ edges.
         Moreover, such sparsifier can be found in time
-        $O(m \log^3 n)$ with high probability.
+        $O(m \log^3 n + n \log n / \eps^2)$ with high probability.
     \end{theorem}
     One of the immediate applications of this powerful theorem is the following.
     Using the algorithm of Goldberg and Rao~\cite{GR98} we can find a maximum $(s, t)$-flow
@@ -57,9 +58,68 @@
     and then run the algorithm. The overall running time is
     $\tilde{O}(m + n^{3/2} / \eps^3)$.
 
+    Theorem~\ref{benczur_karger} is proved using randomized sampling. The naive idea would
+    be to use uniform subsampling. The problem with it is that it can fail miserably:
+    if $G$ has a bridge, then we have to save it, but in order to ensure that this will be
+    the case, we have to set the probability of subsampling very close to $1$.
+    So, we have to take \emph{connectivities} of edges into account.
+    It turns out that if we define the notion of connectivity appropriately and sample
+    edges with probabilities inversely proportional to connectivities, then we can get
+    Theorem~\ref{benczur_karger}.
+
     The notion of cut sparsification can be reformulated (and then significantly extended)
     using linear-algebraic tools.
     \subsubsection{Graph Laplacian}
+    For any undirected graph $G = (V, E, w)$ we can consider the following quadratic
+    form:
+    $$
+        L_G(x) = \sum_{\set{i, j} \in E} w_{ij} (x_i - x_j)^2.
+    $$
+    Clearly, if $x$ is an indicator for some subset $S \subseteq V$, then $L(x)$
+    is exactly equal to the size of the cut $(S, \bar{S})$.
+    Thus, we can reformulate Theorem~\ref{benczur_karger} as follows: for every weighted
+    undirected graph $G$ there exists a graph $G'$ with $O(n \log n / \eps^2)$ edges such
+    that for every $x \in \set{0, 1}^n$ we have $L_{G'}(x) \in (1 \pm \eps) L_G(x)$.
+    The quadratic form (and the corresponding matrix) $L_G$ is called Laplacian of $G$.
+
+    It turns out that we can preserve not only $L_G(x)$ for $x \in \set{0, 1}^n$, but
+    we can preserve $L_G(x)$ for any $x$! Let us give the corresponding definition:
+    \begin{definition}
+        Let $G = (V, E, w)$ be an undirected weighted graph.
+        We say that $G' = (V, E', w')$ is an $\eps$-spectral sparsifier
+        for $G$ if for every $x \in \Rbb^n$ we have $L_{G'}(x) \in (1 \pm \eps) L_G(x)$.
+    \end{definition}
+
+    The notion of spectral sparsification was first introduced by Spielman and Teng
+    in~\cite{ST11}. They proved that for every graph there exists an $\eps$-spectral
+    sparsifier with $\tilde{O}(m \cdot \mathrm{poly}(1 / \eps))$ edges.
+    Moreover, it can be found in time $\tilde{O}(m \cdot \mathrm{poly}(1 / \eps))$
+    with high probability.
+    The proof roughly goes as follows: first, we prove that there exists a partition of
+    a graph such that every part is well-connected, and there are at most half of the
+    edges between the parts. Then, we prove that if a graph is well-connected then
+    one can sample edges with probabilities inversely proportional to the sum of degrees
+    of endpoints. Then, we recurse and sparsify the edges between the parts.
+    The proof if technically very involved.
+    Moreover, the exponent of poly-logarithmic factor is large for this
+    construction.
+
+    In the follow-up work Spielman and Srivastava~\cite{SS11} singificantly simplifed
+    and strenghtened the result from~\cite{ST11}.
+    They proved the following theorem.
+    \begin{theorem}
+        For every graph there exists an $\eps$-sparsifier with $O(n \log n / \eps^2)$
+        edges. Moreover, it can be constructed in time $\tilde{O}(m)$.
+    \end{theorem}
+    The proof is very simple: we sample edges with probabilities proportional to
+    \emph{the effective resistances}. Say we replace every edge with a 1 Ohm resistor.
+    Then for every edge we can define an effective resistance between its endpoints.
+    It sounds surprising that the effective resistances are of use for spectral
+    sparsification, but at least the more effective resistance is the less connected
+    endpoints are, so we should try to preserve edges with high effective resistances.
+    It turns out that effective resistances and Laplacian are closely connected, and,
+    in some sense, the effective resistances are the right probabilities for sampling,
+    if one wants to preserve Laplacian.
     \subsection{Vertex Sparsification}
     \section{Spectral Sparsification}
     \section{Vertex Sparsification}
