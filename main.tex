@@ -17,9 +17,38 @@
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
 
 \begin{document}
-    \title{Edge and Vertex Sparsifiers of Undirected Graphs}
+    \title{Edge and Vertex Sparsification of Undirected Graphs}
     \date{}
     \maketitle
+
+    \section{Introduction}
+    We consider two sparsification procedures for undirected graphs that respect (to some extent) values of
+    flows and cuts. The first is spectral sparsification, which was initially introduced by Spielman and Teng~\cite{} and was
+    inspired by a combinatorial notion of cut sparsification by Benczur and Karger~\cite{}.
+    The second is vertex sparsification discovered by Leighton and Moitra~\cite{}~\cite{}.
+    \subsection{Spectral Sparsification}
+    Let us first define cut sparsifiers.
+    \begin{definition}
+        Let $G = (V, E, w)$ be an undirected weighted graph.
+        We say that $G' = (V, E', w')$ is an $\eps$-cut sparsifier for $G$ if all cut values of $G'$ are within
+        $1 \pm \eps$ the corresponding cut values of $G$.
+    \end{definition}
+    The goal is to construct a sparsifier for a fixed $\eps$ and with as few edges as possible.
+    The following result is due to Benczur and Karger~\cite{}.
+    \begin{theorem}
+        Every graph has $\eps$-cut sparsifier with $O(n \log n / \eps^2)$ edges.
+        Moreover, such sparsifier can be found in time $O(m \ldots)$\footnote{What is the exact running time?}.
+    \end{theorem}
+    This powerful theorem has several immediate applications:
+    \begin{itemize}
+        \item Using an algorithm of Orlin for finding maximum $(s,t)$-flow with running time $O(nm)$ one can find a
+        $(1 + \eps)$-approximation for the maximum $(s, t)$-flow in time $\tilde{O}(m + n^2 / \eps^2)$.
+        \item\footnote{What else?}
+    \end{itemize}
+    The notion of cut sparsification can be reformulated (and then significantly extended) using linear-algebraic tools.
+    \subsection{Graph Laplacian}
+    \subsection{Vertex Sparsification}
 \end{document}

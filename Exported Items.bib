@@ -1,0 +1,52 @@
+
+@article{koutis_nearly-mlogn_2011,
+	title = {A nearly-mlogn time solver for {SDD} linear systems},
+	url = {http://arxiv.org/abs/1102.4842},
+	abstract = {We present an improved algorithm for solving symmetrically diagonally dominant linear systems. On input of an \$n{\textbackslash}times n\$ symmetric diagonally dominant matrix {\$A\$} with \$m\$ non-zero entries and a vector \$b\$ such that {\$A{\textbackslash}bar{x}} = b\$ for some (unknown) vector \${\textbackslash}bar{x}\$, our algorithm computes a vector \$x\$ such that \${\textbar}{\textbar}{x}-{\textbackslash}bar{x}{\textbar}{\textbar}{\_A} {\textless} {\textbackslash}epsilon {\textbar}{\textbar}{\textbackslash}bar{x}{\textbar}{\textbar}{\_A} \$ {\${\textbar}{\textbar}{\textbackslash}cdot{\textbar}{\textbar}{\_A\$} denotes the A-norm} in time \$\${{\textbackslash}tilde O}(m{\textbackslash}log n {\textbackslash}log (1/{\textbackslash}epsilon)).\$\$ The solver utilizes in a standard way a `preconditioning' chain of progressively sparser graphs. To claim the faster running time we make a two-fold improvement in the algorithm for constructing the chain. The new chain exploits previously unknown properties of the graph sparsification algorithm given in {[Koutis,Miller,Peng}, {FOCS} 2010], allowing for stronger preconditioning properties. We also present an algorithm of independent interest that constructs nearly-tight low-stretch spanning trees in time \${\textbackslash}tilde{O}(m{\textbackslash}log{n})\$, a factor of {\$O({\textbackslash}log{n})\$} faster than the algorithm in {[Abraham,Bartal,Neiman}, {FOCS} 2008]. This speedup directly reflects on the construction time of the preconditioning chain.},
+	urldate = {2012-11-20},
+	journal = {{arXiv:1102.4842}},
+	author = {Koutis, Ioannis and Miller, Gary and Peng, Richard},
+	month = feb,
+	year = {2011},
+	keywords = {Computer Science - Data Structures and Algorithms},
+	file = {1102.4842 PDF:/Users/ilyaraz/Library/Application Support/Zotero/Profiles/a0tux620.default/zotero/storage/NKNH9TW2/Koutis et al. - 2011 - A nearly-mlogn time solver for SDD linear systems.pdf:application/pdf;arXiv.org Snapshot:/Users/ilyaraz/Library/Application Support/Zotero/Profiles/a0tux620.default/zotero/storage/HCGHS6VW/1102.html:text/html}
+},
+
+@inproceedings{leighton_extensions_2010,
+	title = {Extensions and limits to vertex sparsification},
+	isbn = {9781450300506},
+	url = {http://dl.acm.org/citation.cfm?doid=1806689.1806698},
+	doi = {10.1145/1806689.1806698},
+	urldate = {2012-11-26},
+	publisher = {{ACM} Press},
+	author = {Leighton, F. Thomson and Moitra, Ankur},
+	year = {2010},
+	pages = {47},
+	file = {Extensions and limits to vertex sparsification | DeepDyve:/Users/ilyaraz/Library/Application Support/Zotero/Profiles/a0tux620.default/zotero/storage/WPUVMUGS/extensions-and-limits-to-vertex-sparsification-PzILhIOobI.html:text/html;mcfspar.pdf:/Users/ilyaraz/Library/Application Support/Zotero/Profiles/a0tux620.default/zotero/storage/AHQN88WE/mcfspar.pdf:application/pdf}
+},
+
+@inproceedings{moitra_approximation_2009,
+	title = {Approximation Algorithms for Multicommodity-Type Problems with Guarantees Independent of the Graph Size},
+	doi = {10.1109/FOCS.2009.28},
+	abstract = {Linial, London and Rabinovich [16] and Aumann and Rabani [3] proved that the min-cut max-flow ratio for general maximum concurrent flow problems (when there are k commodities) is O(logfe). Here we attempt to derive a more general theory of Steiner cut and flow problems, and we prove bounds that are poly-logarithmic in k for a much broader class of multicommodity flow and cut problems. Our structural results are motivated by the meta question: Suppose we are given a poly(log n) approximation algorithm for a flow or cut problem when can we give a poly(log k) approximation algorithm for a generalization of this problem to a Steiner cut or flow problem? Thus we require that these approximation guarantees be independent of the size of the graph, and only depend on the number of commodities (or the number of terminal nodes in a Steiner cut problem). For many natural applications (when k = no(1)) this yields much stronger guarantees. We construct vertex-sparsifiers that approximately preserve the value of all terminal min-cuts. We prove such sparsifiers exist through zero-sum games and metric geometry, and we construct such sparsifiers through oblivious routing guarantees. These results let us reduce a broad class of multicommodity-type problems to a uniform case (on k nodes) at the cost of a loss of a poly (log k) in the approximation guarantee. We then give poly(log k) approximation algorithms for a number of problems for which such results were previously unknown, such as requirement cut, 1-multicut, oblivious 0-extension, and natural Steiner generalizations of oblivious routing, min-cut linear arrangement and minimum linear arrangement.},
+	booktitle = {50th Annual {IEEE} Symposium on Foundations of Computer Science, 2009. {FOCS} '09},
+	author = {Moitra, A.},
+	month = oct,
+	year = {2009},
+	keywords = {approximation algorithms, approximation guarantees, computational complexity, metric geometry, min-cut max-flow ratio, multicommodity-type problems, polynomial approximation, vertex-sparsifiers, zero-sum games},
+	pages = {3 --12},
+	file = {IEEE Xplore Abstract Record:/Users/ilyaraz/Library/Application Support/Zotero/Profiles/a0tux620.default/zotero/storage/45WT39ST/articleDetails.html:text/html;logk.pdf:/Users/ilyaraz/Library/Application Support/Zotero/Profiles/a0tux620.default/zotero/storage/BR8XHGZK/logk.pdf:application/pdf}
+},
+
+@article{spielman_graph_2008,
+	title = {Graph Sparsification by Effective Resistances},
+	url = {http://arxiv.org/abs/0803.0929},
+	abstract = {We present a nearly-linear time algorithm that produces high-quality sparsifiers of weighted graphs. Given as input a weighted graph {\$G=(V,E},w)\$ and a parameter \${\textbackslash}epsilon{\textgreater}0\$, we produce a weighted subgraph {\$H=(V},{\textbackslash}tilde{E},{\textbackslash}tilde{w})\$ of {\$G\$} such that \${\textbar}{\textbackslash}tilde{E}{\textbar}{=O(n{\textbackslash}log} n/{\textbackslash}epsilon{\textasciicircum}2)\$ and for all vectors \$x{\textbackslash}in{\textbackslash}R{\textasciicircum}V\$ \$(1-{\textbackslash}epsilon){\textbackslash}sum\_{uv{\textbackslash}in E}(x(u)-x(v)){\textasciicircum}2w\_{uv}{\textbackslash}le {\textbackslash}sum\_{uv{\textbackslash}in{\textbackslash}tilde{E}}(x(u)-x(v)){\textasciicircum}2{\textbackslash}tilde{w}\_{uv} {\textbackslash}le (1+{\textbackslash}epsilon){\textbackslash}sum\_{uv{\textbackslash}in E}(x(u)-x(v)){\textasciicircum}2w\_{uv}. (*)\$ This improves upon the sparsifiers constructed by Spielman and Teng, which had {\$O(n{\textbackslash}log{\textasciicircum}c} n)\$ edges for some large constant \$c\$, and upon those of Bencz{\textbackslash}'ur and Karger, which only satisfied (*) for \$x{\textbackslash}in{\textbackslash}{0,1{\textbackslash}}{\textasciicircum}V\$. A key ingredient in our algorithm is a subroutine of independent interest: a nearly-linear time algorithm that builds a data structure from which we can query the approximate effective resistance between any two vertices in a graph in {\$O({\textbackslash}log} n)\$ time.},
+	urldate = {2012-11-20},
+	journal = {{arXiv:0803.0929}},
+	author = {Spielman, Daniel A. and Srivastava, Nikhil},
+	month = mar,
+	year = {2008},
+	keywords = {Computer Science - Data Structures and Algorithms, G.2.2},
+	file = {0803.0929 PDF:/Users/ilyaraz/Library/Application Support/Zotero/Profiles/a0tux620.default/zotero/storage/KVSU5Z2S/Spielman and Srivastava - 2008 - Graph Sparsification by Effective Resistances.pdf:application/pdf;arXiv.org Snapshot:/Users/ilyaraz/Library/Application Support/Zotero/Profiles/a0tux620.default/zotero/storage/VA5UA2K4/0803.html:text/html}
+}
