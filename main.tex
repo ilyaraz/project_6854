@@ -190,6 +190,18 @@
     computations of the form $L^+ x$ for some vectors $x$. For this we can employ
     Laplacian solvers.
 
+    For any Laplacian $L$ and any $x$ we can find a vector $y$ such that
+    $$
+        \|y - L^+x\|_L \leq \eps \|L^+x\|_L,
+    $$
+    where $\|u\|_L := \sqrt{u^t L u}$, in time $\tilde{O}(m \log(1 / \eps))$. It turns out
+    that for us it is sufficient to take $\eps = n^{-\Theta(1)}$, so the total running time
+    is $\tilde{O}(m)$.
+
+    \subsection{Laplacian Solver}
+
+    \subsection{Sparsifiers with linear number of edges}
+
     \section{Vertex Sparsification}
     \bibliographystyle{alpha}
     \bibliography{ir}
