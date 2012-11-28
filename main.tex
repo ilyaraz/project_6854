@@ -138,6 +138,57 @@
     $$
         \|(L_G^+)^{1/2} L_{G'} (L_G^+)^{1/2} - I_{\mathrm{im}(L_G)}\|_2 \leq \eps.
     $$
+    \textbf{Remark:} actually, $I_{\mathrm{im}(L_G)} = I_n - J_n / n$.
+
+    \begin{theorem}[Rudelson--Vershynin]
+        If $u$ is a vector random variable distributed over $\mathbb{R}^n$ such that
+        \begin{itemize}
+            \item $\mathbf{Pr}[\|u\|_2 \leq M] = 1$;
+            \item $\|\mathbf{E}[uu^t]\|_2 \leq 1$,
+        \end{itemize}
+        then
+        $$
+            \mathbf{E}\left[\left\|\frac{1}{N} \sum_{i=1}^N u_i u_i^t -
+            \mathbf{E}[uu^t]\right\|_2\right] \leq O\left(M \sqrt{\frac{\log N}{N}}\right),
+        $$
+        where $u_i$'s are independent copies of $u$.
+    \end{theorem}
+
+    Suppose we want to form a graph $G'$ by sampling edges of $G$ with probabilities
+    $p_{vw}$.
+    We want to apply Rudelson--Vershynin, but to make it as efficient as possible, we want
+    to have small enough $M$.
+    Clearly, if we set $L_G' = \sum_{i=1}^N y_i y_i^t / N$, where $y_i$ is equal to
+    $(e_v - e_w) / \sqrt{p_{vw}}$ with probability $p_{vw}$, then we have
+    $\mathbf{E}[L_G'] = L_G$.
+
+    So, we set $u = (L_G^+)^{1/2} (e_v - e_w) / \sqrt{p_{vw}}$ with probability $p_{vw}$.
+    Clearly, $\|E[uu^t]\|_2 = \|I_{\mathrm{im}(L_G)}\|_2 = 1$. Also,
+    $\|u\|_2 \leq \max_{vw} \sqrt{R_{vw} / p_{vw}} =: M$.
+    If we want to minimize $M$ we should take $p$'s proportional to $R$'s.
+    Since
+    $$
+        \sum_{vw} R_{vw} = \mathrm{tr}(ML^+M^t) = \mathrm{tr}(M^tML^+) =
+        \mathrm{tr}(LL^+) = \mathrm{tr}(I_{\mathrm{im}(L)}) = n - 1,
+    $$
+    we have $M = \sqrt{n - 1}$. So, from Rudelson--Vershynin we get that we need
+    $O(n \log n / \eps^2)$ samples.
+
+    \subsection{Algorithms}
+
+    From the existential argument we get an algorithm with running time $O(n^{\omega})$.
+    The bottleneck is computing $L^+$.
+    But what we actually need is effective resistances:
+    $$
+        R_{vw} = (e_v - e_w)^t L^+ (e_v - e_w) = \|ML^+ (e_v - e_w)\|_2^2.
+    $$
+    So, we want to be able to estimate $\ell_2$-distance between the columns of
+    $ML^+$. We can use the dimension reduction paradigm: let us multiply $ML^+$ by
+    a random $\pm 1$-matrix $A$: so we get $O(\log n) \times n$ matrix $AML^+$ that
+    $O(1)$-preserves pairwise $\ell_2$ distances between columns.
+    We can compute $AM$ in $\tilde{O}(m)$ time, and our problem reduces to $\tilde{O}(1)$
+    computations of the form $L^+ x$ for some vectors $x$. For this we can employ
+    Laplacian solvers.
 
     \section{Vertex Sparsification}
     \bibliographystyle{alpha}
