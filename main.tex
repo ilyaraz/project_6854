@@ -122,6 +122,23 @@
     if one wants to preserve Laplacian.
     \subsection{Vertex Sparsification}
     \section{Spectral Sparsification}
+    \textbf{The following text will be rewritten}
+
+    We want that for every $x$ we have $(1 - \eps) x^t L_G x \leq x^t L_{G'} x \leq (1 + \eps) x^t L_G x$.
+    If $x \in \mathrm{ker}(L_G)$, then $x^t L_G x = x^t L_{G'} x = 0$ (here we use that $G$ is connected).
+    So, we want
+    $$
+        \sup_{x \in \mathrm{im}(L_G)} \left|\frac{x^t (L_{G'} - L_G) x}{x^t L_G x} \right| \leq \eps.
+    $$
+    Since $\mathrm{im}(L_G) = \mathrm{im}(L_G^+)$, we want
+    $$
+        \sup_{y} \left|\frac{y^t (L_G^+)^{1/2} (L_{G'} - L_G) (L_G^+)^{1/2} y}{y^t y}\right| \leq \eps.
+    $$
+    Or, equivalently,
+    $$
+        \|(L_G^+)^{1/2} L_{G'} (L_G^+)^{1/2} - I_{\mathrm{im}(L_G)}\|_2 \leq \eps.
+    $$
+
     \section{Vertex Sparsification}
     \bibliographystyle{alpha}
     \bibliography{ir}
