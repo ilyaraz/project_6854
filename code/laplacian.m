@@ -12,6 +12,6 @@ end
 d = eig(l);
 output = fopen('output.txt', 'w');
 for i = 1 : n
-    fprintf(output, '%.20f\n', d(i));
+    fprintf(output, '%.20f %.20f\n', d(i), i / n);
 end
 fclose(output);
