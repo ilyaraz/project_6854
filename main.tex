@@ -357,8 +357,9 @@
         \label{spu}
         Suppose that
         $$
-            I = \sum_{i=1}^m q_i q_i^t
+            I = \sum_{i=1}^m q_i q_i^t,
         $$
+        where $q_i \in \mathbb{R}^n$
         and $\eps > 0$~--- some parameter.
         What is the minimum $N$ such that there exists a subset $S \subseteq [m]$ with
         $|S| = N$ and non-negative numbers $\alpha_i \geq 0$ for every $i \in [m]$ such that
@@ -380,7 +381,77 @@
     What $N$ and $p_i$ should we choose, if we want $N$ to be relatively small?
     In~\cite{R96,RV07} the following celebrated result was proved.
     \begin{theorem}
+        \label{rv_inequality}
+        Let $y$ be an $n$-dimensional vector-valued random variable.
+        Suppose that $\|y\|_2 \leq M$ with probability $1$ and
+        $\|\mathbf{E}[yy^t]\|_2 \leq 1$. Then,
+        \begin{equation}
+            \label{rv_formula}
+            \mathbf{E}[\|\frac{1}{N} \sum_{i = 1}^{N} y_i y_i^t - \mathbf{E}[y_i y_i^t]\|_2]
+            \leq O\left(M \sqrt{\frac{\log N}{N}}\right),
+        \end{equation}
+        where $y_i$ -- independent copies of $y$.
     \end{theorem}
+
+    We apply this theorem to the following random variable: we choose $i \in [m]$
+    with probability $p_i$ and then set $y := q_i / \sqrt{p_i}$.
+    In order to make the RHS of~(\ref{rv_formula}) as small as possible, we should
+    minimize $M = \max_i \|q_i\|_2 / \sqrt{p_i}$. Clearly, in order to do this
+    we should choose $p_i$ proportional to $\|q_i\|_2^2$.
+    In this case
+    $$
+        M = \sqrt{\sum_{i=1}^m \|q_i\|_2^2} =
+        \sqrt{\sum_{i=1}^m \mathrm{tr}(q_i q_i^t)} =
+        \sqrt{\mathrm{tr}\left(\sum_{i=1}^m q_i q_i^t\right)} = \sqrt{n}.
+    $$
+    So, from Theorem~\ref{rv_inequality} we see that we can take $N = O(n \log n / \eps^2)$
+    and get the deviation of the spectral norm at most by $\eps / 2$ in expectation.
+    Using Markov inequality we see that with probability at least $1/2$ the deviation
+    is at most $\eps$. Repeating the sampling process several times independently
+    we can boost the probability of success.
+
+    \subsection{Near-linear Time Laplacian Sparsification}
+
+    The argument from the previous section gives a near-linear time algorithm for solving
+    Problem~\ref{spu}. But our initial motivation was to sparsify the Laplacian of a graph
+    $G$. The catch here is that our reduction to Problem~\ref{spu} requires a computation
+    of $(L^+)^{1/2}$, which we do not know how to do faster than in time $O(n^{2.373})$.
+    So, in order to be able to use the argument from the previous section, we have to solve
+    the following problem: for every edge $(v, w) \in E$ compute
+    $r_{vw} := \|q_{vw}\|_2^2 =
+    \|(L^+)^{1/2}(e_v - e_w)\|_2^2 = (e_v - e_w)^t L^+ (e_v - e_w)$.
+    Despite we do not know how to compute $r_{vw}$'s exactly in near-linear time we can
+    observe, that actually any constant-factor approximations for $r_{vw}$'s are sufficient
+    (it will only affect the hidden constant factor in the resulting number of edges).
+    Thus, we face the following problem:
+    \begin{problem}
+        Compute the constant-factor approximations to
+        $$
+            r_{vw} = (e_v - e_w)^t L^+ (e_v - e_w).
+        $$
+    \end{problem}
+
+    Let us use the following presentation of $L$: $L = M^t M$, where $M$ is the incidence
+    matrix of $G$ ($m$ by $n$ matrix whose rows correspond to the edges, a row that
+    corresponds to $(v, w)$ equals to $(e_v - e_w)^t$). Thus,
+    $$
+        r_{vw} = (e_v - e_w)^t L^+ (e_v - e_w)^t = (e_v - e_w)^t L^+ L L^+ (e_v - e_w) =
+        \|M L^+ (e_v - e_w)\|_2^2.
+    $$
+    So, we are interested in pairwise $\ell_2$-distances between the columns of
+    $M L^+$.
+    To compute $M L^+$ we can, for example multiply each row of $M$ by $L^+$. It turns
+    out that there is a way to do it in near-linear time per row using solvers for graph
+    Laplacians (for example, the one described in~\cite{KMP10}).
+    But the problem is that we have $m$ rows, so the overall running time would be
+    $\tilde{O}(m^2)$.
+    Luckily, we can fix this problem. Since we care only about approximate pairwise
+    distances we can employ the dimension reduction technique~\cite{DG03}:
+    if $Q$ is a random
+    $O(\log n) \times m$ matrix whose entries are i.i.d. Gaussians, then with
+    high probability the pairwise distances between the columns of $QML^{+}$ approximate
+    those from $ML^+$. We can multiply $Q$ by $M$ in time $O(m \log n)$, and then
+    invoke the Laplacian solver $O(\log n)$ times.
 
     \subsection{Iterative Sparsification}
 
