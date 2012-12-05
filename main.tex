@@ -18,6 +18,7 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 \newtheorem{definition}{Definition}
+\newtheorem{problem}{Problem}
 
 \begin{document}
     \title{Edge and Vertex Sparsification of Undirected Graphs}
@@ -202,6 +203,186 @@
 
     \subsection{Sparsifiers with linear number of edges}
     \cite{BSS09}
+
+    \section{Spectral Sparsification}
+
+    \subsection{Preliminaries}
+
+    \subsubsection{Linear Algebra 101}
+
+    Let $A \in \mathbb{R}^{n \times n}$ be a symmetric matrix. 
+    \begin{theorem}[Eigendecomposition]
+        All the eigenvalues
+        of $A$ are real and there exists an orthonormal basis of $\mathbb{R}^n$
+        that consists of $A$'s eigenvectors.
+
+        We can write
+        $$
+            A = \sum_{i=1}^n \lambda_i u_i u_i^t,
+        $$
+        where $\lambda_1, \lambda_2, \ldots, \lambda_n$ are the eigenvalues of $A$, and
+        $u_1, u_2, \ldots, u_n$ are the corresponding eigenvectors that form an orthonormal
+        basis of $\mathbb{R}^n$. This decomposition is called \emph{eigendecomposition}
+        of $A$.
+    \end{theorem}
+
+    We can use the notion of eigendecomposition to introduce a pseudoinverse of $A$.
+
+    \begin{definition}[Pseudoinverse]
+        A \emph{pseudoinverse} of $A$ is the following matrix:
+        $$
+            A^+ := \sum_{i : \lambda_i \ne 0} \frac{1}{\lambda_i} u_i u_i^t.
+        $$
+    \end{definition}
+
+    Clearly, if $A$ is non-degenerate (equivalently, $\lambda_i \ne 0$ for every $i$),
+    then $A^+ = A^{-1}$.
+    On the other hand, for every symmetric $A$
+    $$
+        A A^+ = A^+ A = I_{\mathrm{im}(A)},
+    $$
+    where $I_{\mathrm{im}(A)}$ is a linear operator that maps vectors from $\mathrm{ker}(A)$
+    to zero and maps vectors from $\mathrm{im}(A)$ to themselves (this definition is correct,
+    because we can consider a decomposition
+    $\mathbb{R}^n = \mathrm{ker}(A) \oplus \mathrm{im}(A)$).
+
+    If a symmetric matrix is positive semi-definite (equivalently, all the eigenvalues
+    are non-negative), then we can consider its square root.
+
+    \begin{definition}[Square Root of a PSD Matrix]
+        $$
+            A^{1/2} := \sum_{i} \sqrt{\lambda_i} u_i u_i^t.
+        $$
+    \end{definition}
+    Clearly, $A^{1/2} A^{1/2} = A$.
+
+    During the presentation of spectral sparsification algorithms we will use the following
+    matrix norm crucially.
+
+    \begin{definition}[Spectral Norm]
+        $$
+            \|A\|_2 := \max_{x} \frac{\|Ax\|_2}{\|x\|_2}.
+        $$
+    \end{definition}
+
+    For symmetric matrices spectral norm is just the maximum absolute value of an eigenvalue.
+    If $I$ is the identity matrix, then $\|A - I\|_2 \leq \eps$ iff all the eigenvalues of
+    $A$ lie within $[1 - \eps; 1 + \eps]$.
+
+    \subsubsection{Graph Laplacian}
+
+    Let $G = (V, E)$ be an undirected graph.
+
+    \begin{definition}[Laplacian]
+        The following $n \times n$ matrix $L$ is called the Laplacian of $G$:
+        $$
+            x^t L x = \sum_{(v,w) \in E} (x_v - x_w)^2. 
+        $$
+    \end{definition}
+
+    Clearly, $L_{vv}$ equals to the degree of $v$ and $L_{vw} = -1$, if $(v, w) \in E$,
+    and $0$, otherwise.
+    Since $L$ is positive-semidefinite, all $L$'s eigenvalues are non-negative. Let
+    $0 \leq \lambda_1 \leq \lambda_2 \leq \ldots \leq \lambda_n$ be the eigenvalues of $L$.
+
+    \begin{lemma}
+        For every graph $G$ $\lambda_1 = 0$. Moreover, $G$ is connected iff $\lambda_2 > 0$.
+    \end{lemma}
+    \begin{proof}
+        Clearly, $\mathbf{1}^t L \mathbf{1} = 0$, so, $\lambda_1 = 0$ and the corresponding
+        eigenvector is $\mathbf{1} / \sqrt{n}$.
+
+        If there is a non-zero
+        vector within the kernel of $L$ that is orthogonal to $\mathbf{1}$
+        it is easy to see that there are no edges connecting negative and positive
+        coordinates, so $G$ is disconnected. Conversely, if $G$ is connected and
+        $x^t L x = 0$, then, clearly, $x = \alpha \mathbf{1}$.
+    \end{proof}
+
+    So, if $G$ is connected, then $\mathrm{ker}(L) = \langle \mathbf{1} \rangle$
+    and $\mathrm{im}(L) = \langle \mathbf{1} \rangle^{\perp}$.
+
+    It turns out that $\lambda_2$ determines how well-connected $G$ is. The larger
+    $\lambda_2$ is, the better connected $G$ is, and vice versa. This fact is known
+    as Cheeger's inequality.
+
+    We can decompose $L$ as follows:
+    $$
+        L = \sum_{(v,w) \in E} (e_v - e_w) (e_v - e_w)^t.
+    $$
+    On the other hand,
+    \begin{equation}
+        \label{full_unity}
+        I_{\mathrm{im}(L)} = (L^+)^{1/2} L (L^+)^{1/2} = \sum_{(v,w) \in E} q_{vw} q_{vw}^t,
+    \end{equation}
+    where $q_{vw} = (L^+)^{1/2} (e_v - e_w)$. Since $q_{vw} \in \mathrm{im}(L)$, we can
+    consider (\ref{full_unity}) only in $\mathrm{im}(L)$: it gives us a decomposition of
+    $(n-1)\times(n-1)$ identity patrix into the sum of $m$ 1-rank matrices.
+    This decomposition is very convenient for both of the algorithms we are about to
+    present.
+
+    What does it mean for a weighted graph $G'$ to approximate the Laplacian of $G$ well?
+    It means that
+    \begin{equation}
+        \label{approx_laplacian}
+        \sup_x \left|\frac{x^t \tilde{L} x - x^t L x}{x^t L x}\right|\leq \eps,
+    \end{equation}
+    where $L$ is the Laplacian of $G$, and $\tilde{L}$ is the Laplacian of $G'$
+    (technically, we defined the Laplacian only for undirected graphs, but for weighted
+    ones the definition remains essentially the same).
+    Clearly, it sufficient to check~(\ref{approx_laplacian}) only for
+    $x \in \mathrm{im}(L)$.
+    If we denote $y = L^{1/2} x$, then we have to check whether
+    $$
+        \sup_{y \in \mathrm{im}(L)} \left|\frac{y^t (L^+)^{1/2}
+            \tilde{L} (L^+)^{1/2} y - y^t y}{y^t y}\right| \leq \eps.
+    $$
+    But this condition is equivalent to
+    \begin{equation}
+        \label{closeness}
+        \|(L^+)^{1/2} \tilde{L} (L^+)^{1/2} - I_{\mathrm{im}(L)}\|_2 \leq \eps.
+    \end{equation}
+    If we require $G'$ to be a (weighted) subgraph of $G$, then
+    \begin{equation}
+        \label{subgraph}
+        \tilde{L} = \sum_{(v,w)\in E} m_{vw} (e_v - e_w) (e_v - e_w)^t,
+    \end{equation}
+    where $m_{vw}$ is a weight of an edge $(v, w)$.
+
+    So, combining~(\ref{full_unity}), (\ref{closeness}) and (\ref{subgraph}),
+    we reduce the problem of spectral sparsification to the following clean
+    linear-algebraic problem.
+
+    \begin{problem}[Sparsification of Partition of Unity]
+        \label{spu}
+        Suppose that
+        $$
+            I = \sum_{i=1}^m q_i q_i^t
+        $$
+        and $\eps > 0$~--- some parameter.
+        What is the minimum $N$ such that there exists a subset $S \subseteq [m]$ with
+        $|S| = N$ and non-negative numbers $\alpha_i \geq 0$ for every $i \in [m]$ such that
+        $$
+            \|I - \sum_{i \in S} \alpha_i q_i q_i^t\|_2 \leq \eps?
+        $$
+    \end{problem}
+
+    \subsection{Sparsification by Sampling}
+
+    The paper~\cite{SS11} solves Problem~\ref{spu} using random sampling.
+    Suppose that we pick $i_1, i_2, \ldots, i_N \in [m]$ independently so that
+    $\mathbf{Pr}[i_j = i] = p_i$, where $p_i$ are some probabilities.
+    We want to choose $p_i$ and $N$ so that
+    $\|I - \sum_{j \in [N]} q_{i_j} q_{i_j}^t / (N\cdot p_{i_j})\|_2 \leq \eps$
+    with high (or at least with non-zero) probability (we need the normalizing
+    factor $1 / Np_{i_j}$ in order for the random sum to be equal to $I$ in expectation).
+
+    What $N$ and $p_i$ should we choose, if we want $N$ to be relatively small?
+    In~\cite{R96,RV07} the following celebrated result was proved.
+    \begin{theorem}
+    \end{theorem}
+
+    \subsection{Iterative Sparsification}
 
     \section{Vertex Sparsification}
     \bibliographystyle{alpha}
