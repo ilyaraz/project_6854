@@ -455,6 +455,55 @@
 
     \subsection{Iterative Sparsification}
 
+    Unlike~\cite{SS11}, a completely different approach for solving Problem~\ref{spu}
+    is used in~\cite{BSS09}.
+    If in the RHS of~\ref{rv_formula} there were not $\sqrt{\log N}$ factor, the exactly
+    the same sampling procedure would give sparsifiers with $O(n / \eps^2)$ terms.
+    Unfortunately, this factor is unavoidable.
+    If $y$ is a random basis vector, then, clearly, we need at least $\Omega(n \log n)$
+    samples to choose each vector at least once.
+    Thus, no matter what probabilities do we use for (independent) sampling, we can not
+    overcome the bound $O(n \log n)$.
+
+    So, to get the optimal $O(n / \eps^2)$ one has to use ``deterministic'' methods.
+    We will use the iterative approach: on each step we keep track to a current approximation
+    $A$ of the identity, and update $A$ by adding a multiple $\alpha q_i q_i^t$ for some
+    carefully chosen $\alpha$ and $i$ (this update procedure is called rank-$1$ update).
+    Since we want that our resulting matrix to have all eigenvalues within
+    $[1 - \eps; 1 + \eps]$, let us first study how eigenvalues behave under rank-$1$
+    updates.
+
+    Since the trace of a matrix equals to the sum of its eigenvalues we see that if
+    we increase $A$ by $vv^t$, then the sum of eigenvalues increases by $\|v\|_2^2$.
+    So, ``on average'' every eigenvalue increases by $\|v\|_2^2 / n$.
+    If we managed to get many of such ``uniform'' increases, then we would have been done:
+    after some time all eigenvalues will be within $(1 \pm \eps)$ of each other, so after
+    the proper normalization they will be within $[1 - \eps; 1 + \eps]$.
+
+    Unfortunately, there is no guarantee that all eigenvalues will be increased by
+    (approximately) the same amount.
+    Here comes the brilliant idea of Batson, Spielman, and Srivastava~\cite{BSS09}.
+    They consider the following ``barrier'' potential functions which allow us to conclude
+    that all eigenvalues grow on a steady pace.
+
+    \begin{definition}
+        Let use denote by $\lambda_1, \lambda_2, \ldots, \lambda_n$ the eigenvalues of
+        a square matrix $A$. Then,
+        \begin{eqnarray*}
+            L_{x}(A) &:=& \sum_{i} \frac{1}{\lambda_i - x}; \\
+            U_{x}(A) &:=& \sum_{i} \frac{1}{x - \lambda_i}.
+        \end{eqnarray*}
+        Let us call $L_x(A)$ \emph{lower barrier} and $U_x(A)$~--- upper barrier,
+        respectively.
+    \end{definition}
+
+    Clearly, $L_x(A)$ is increasing in $x$ and $U_x(A)$ is, on the other hand, decreasing.
+    These barriers blow up, whenever $x$ equals to some eigenvalue.
+
+    The overall strategy for sparsification will be the following:
+    \begin{itemize}
+    \end{itemize}
+
     \section{Vertex Sparsification}
     \bibliographystyle{alpha}
     \bibliography{ir}
