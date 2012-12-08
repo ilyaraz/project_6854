@@ -501,8 +501,80 @@
     These barriers blow up, whenever $x$ equals to some eigenvalue.
 
     The overall strategy for sparsification will be the following:
+    let $\eps_L > 0$, $\eps_U > 0$, $\delta_L > 0$, $\delta_U > 0$, $l_0$, $u_0$ be some
+    constants. We have the successive approximations $A_0, A_1, \ldots, A_N$ such that
     \begin{itemize}
+        \item $A_0 = 0$;
+        \item $A_i = A_{i-1} + \alpha q_j q_j^t$ for some $\alpha \geq 0$ and $j \in [m]$;
+        \item $L_{l_0 + i \cdot \delta_L}(A_i) \leq L_{l_0 +
+            (i - 1) \cdot \delta_L}(A_{i-1})
+              \leq \eps_L$;
+        \item $R_{r_0 + i \cdot \delta_R}(A_i) \leq R_{r_0 +
+            (i - 1) \cdot \delta_R}(A_{i-1})
+              \leq \eps_R$;
+        \item all eigenvalues of $A_i$ are within $(l_0 + i \cdot \delta_L; r_0 + i \cdot
+              \delta_R)$.
     \end{itemize}
+
+    In the end of the day we will choose the parameters as follows: $\delta_L = 1$,
+    $\delta_R = 1 + \Theta(\eps)$, $l_0 = -\Theta(n / \eps)$, $r_0 = \Theta(n / \eps)$.
+    Clearly, it implies that after $O(n / \eps^2)$ steps all the eigenvalues will be
+    within $(1 \pm \eps)$ of each other, so we are done.
+
+    The main question is, of course, how to choose $\alpha$ and $q_j$ to maintain all the
+    invariants. The plan of the argument is the following: first, we derive
+    (rather ugly looking) conditions on $j$ that imply that there exists an $\alpha$ such
+    that if we set $A_i := A_{i-1} + \alpha q_j q_j^t$, then all the invariants will be
+    maintained. Then, we prove that if we choose $j$ uniformly at random, then
+    ``on expectation'' these conditions will hold.
+    On the algorithmic side it implies that we can try all possible $j$'s and choose the
+    one that works.
+
+    So, suppose we want to set $A_i := A_{i-1} + \alpha q_j q_j^t$ for some $\alpha \geq 0$
+    and $j \in [m]$. The next Lemma quantifies what $\alpha$ we should choose so that
+    $L_{l_0 + i \cdot \delta_L}(A_i) \leq L_{l_0 + (i - 1) \cdot \delta_L}(A_{i-1})$
+    and $R_{r_0 + i \cdot \delta_R}(A_i) \leq R_{r_0 + (i - 1) \cdot \delta_R}(A_{i-1})$.
+
+    For compactness let us denote $l_i := l_0 + i \cdot \delta_L$,
+    $r_i := r_0 + i \cdot \delta_R$.
+
+    \begin{lemma}
+      $L_{l_i}(A_i) \leq L_{l_{i-1}}(A_{i-1})$
+      iff
+      $$
+        0 < \frac{1}{\alpha} \leq -q_j^t (A_{i-1} - l_i I)^{-1} q_j +
+        \frac{q_j^t (A_{i-1} - l_i I)^{-2}q_j}{L_{l_i}(A_{i-1}) - L_{l_{i-1}}(A_{i-1})}
+        =: \sigma(j).
+      $$
+      $R_{r_i}(A_i) \leq R_{r_{i-1}}(A_{i-1})$ iff
+      $$
+        \frac{1}{\alpha} \geq q_j^t (r_i I - A_{i-1})^{-1} q_j +
+        \frac{q_j^t (r_i I - A_{i-1})^{-2} q_j}{R_{r_{i-1}}(A_{i-1}) - R_{r_i}(A_{i-1})}
+        =: \tau(j). 
+      $$
+    \end{lemma}
+    \begin{proof}
+        \footnote{TODO!!!!!}
+    \end{proof}
+
+    Argue about eigenvalues!!!!
+    
+    Now it is left to prove that we can choose the parameters such that on every 
+    iteration there exists
+    $j \in [m]$ such that $\sigma(j) \geq \tau(j)$.
+    We do this using the averaging argument. We show that one choose the parameters such
+    that $\sum_j \sigma(j) \geq \sum_j \tau(j)$.
+
+    We have
+    \begin{eqnarray*}
+        \sum_j \sigma(j) &=& -\sum_t \frac{1}{\lambda_t - l_i} +
+        \frac{\sum_t \frac{1}{(\lambda_t - l_i)^2}}
+        {\sum_t \frac{1}{\lambda_t - l_i} - \sum_t \frac{1}{\lambda_t - l_{i-1}}};\\ 
+        \sum_j \tau(j) &=& \sum_t \frac{1}{r_i - \lambda_t} +
+        \frac{\sum_t \frac{1}{(r_i - \lambda_t)^2}}
+        {\sum_t \frac{1}{r_{i-1} - \lambda_t} - \sum_t \frac{1}{r_i - \lambda_t}},\\ 
+    \end{eqnarray*}
+    where $\lambda_t$ are the eigenvalues of $A_{i-1}$.
 
     \section{Vertex Sparsification}
     \bibliographystyle{alpha}
