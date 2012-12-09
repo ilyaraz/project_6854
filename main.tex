@@ -14,6 +14,7 @@
 \newcommand{\Rbb}{\mathbb{R}}
 \newcommand{\eps}{\varepsilon}
 \newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\XComment}[1]{}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
@@ -21,10 +22,92 @@
 \newtheorem{problem}{Problem}
 
 \begin{document}
-    \title{Edge and Vertex Sparsification of Undirected Graphs}
-    \date{}
+    \title{Spectral Sparsification of Undirected Graphs}
+    \author{Ilya Razenshteyn\\CSAIL, MIT\\\texttt{ilyaraz@mit.edu}}
     \maketitle
 
+    \section{Introduction}
+
+    One recurring topic in Graph Theory is how to approximate a given graph with much sparser one while preserving certain
+    properties. A very useful and clean
+    notion of \emph{cut sparsification} was introduced in~\cite{BK96} by Bencz\'{u}r and Karger.
+    They proved the following result.
+
+    \begin{theorem}[\cite{BK96}]
+        \label{benczur_karger}
+        Let $\eps > 0$ be some sufficiently small parameter.
+        For every undirected weighted graph $G$ there exists another undirected weighted graph $\tilde{G}$ with the
+        same set of vertices and only $O(n \log n / \eps^2)$ edges such that every cut value in $\tilde{G}$
+        is within $(1 \pm \eps)$ of the corresponding value in $G$. Moreover, $\tilde{G}$ can be found in time
+        $O(m \log^3 n)$ with high probability.
+    \end{theorem}
+
+    Two obvious applications of Theorem~\ref{benczur_karger} are the following:
+    \begin{itemize}
+        \item by sparsifying graph and then running the algorithm of Goldberg and Rao~\cite{GR98} we can find
+        $(1 + \eps)$-approximations to the maximum $(s, t)$-flow and the minimum $(s, t)$-cut in time
+        $O(m \log^3 n + n^{3/2} \log n \log(nU) / \eps^3)$, where $U$ is an upper bound on the capacities in our network;
+        \item by sparsifying graph and then running the algorithm of Klein, Stein and Tardos~\cite{KST90} we can find
+        an $O(\log n)$-approximation to the sparsest cut in time $O((m + n^2) \log^3 n)$.
+    \end{itemize}
+
+    The proof of Theorem~\ref{benczur_karger} goes along the following lines. The first naive idea is to employ uniform
+    random sampling (in case of unweighted graphs).
+    It turns out that one can prove that it works, provided that the minimum cut is large enough.
+    To overcome this problem with small cuts one has to sample edges with probabilities proportional to their
+    \emph{strong connectivities}.
+
+    In~\cite{ST11} Spielman and Teng considered a singificantly stronger notion of sparsification: the so called
+    \emph{spectral sparsification}. To define it we need a notion of \emph{graph Laplacian}.
+
+    \begin{definition}
+        Let $G = (V, E, w)$ be an undirected weighted graph. Then the following quadratic form is called \emph{Laplacian}
+        of $G$:
+        $$
+            \mathcal{L}_G(x) = \sum_{(u, v) \in E} w(u, v) (x_u - x_v)^2.
+        $$
+    \end{definition}
+    \begin{definition}
+        We say that $\tilde{G}$ is a spectral sparsifier of $G$, if for every $x \in \Rbb^n$
+        $$
+            \mathcal{L}_{\tilde{G}}(x) \in (1 \pm \eps) \mathcal{L}_G(x).
+        $$
+    \end{definition}
+
+    To see why the notion of spectral sparsification is stronger than that of cut sparsification it is sufficient to observe
+    that $\mathcal{L}_G(\mathbf{1}_S)$ is exactly equal to the cut value of $(S, \bar{S})$.
+    But we require much more: to preserve $\mathcal{L}_G(x)$ for every $x$, not only for the indicators.
+
+    We will survey two constructions of spectral sparsifiers. The first is from~\cite{SS11}, which gives sparsifiers
+    with $O(n \log n / \eps^2)$ matching the bound of Theorem~\ref{benczur_karger}. Moreover, these sparsifiers can be found
+    in near-linear time. The second construction is from~\cite{BSS09}: it gives sparsifiers with $O(n / \eps^2)$ edges,
+    but the algorithm for building them is much slower (nevertheless, even the existance of near-linear-sized spectral
+    sparsifiers is higly non-trivial).
+
+    Let us mention several applications of spectral sparsification.
+
+    First, since spectral sparsifiers approximately preserve spectra of Laplacians, one can look at sparsifiers of the
+    complete graph $K_n$ as expander graphs~\cite{HLW06}. Technically speaking, this analogy is quite vague, because
+    expanders are constant-degree regular graphs, on the other hand, even the best construction of spectral sparsifiers
+    from~\cite{BSS09}, despite giving a constant \emph{average} degree, does not provide graphs with constant maximum
+    degree. Nevetheless, it is proved in~\cite{BSS09} that spectral sparsifiers of $K_n$ share several properties with
+    constant-degree expanders.
+
+    Second, spectral sparsification can be used to prove the existence of good \emph{approximate John decompositions}
+    (see~\cite{B97} for an excellent introduction to Convex Geometry and~\cite{N11} for a great exposition of geometric
+    applications of~\cite{BSS09}).
+
+    Third, spectral sparsification can be used for dimension reduction in $\ell_1$-spaces.
+    The classic theorem of Johnson--Lindenstrauss~\cite{DG03}
+    says that if we have $n$ vectors in $\mathbb{R}^d$, then we can map them into $\mathbb{R}^{O(\log n / \eps^2)}$
+    so that to $(1\pm\eps)$-preserve their pairwise $\ell_2$-distances.
+    This theorem has immense number of applications (in particular, we will use to find spectral sparsifiers quickly).
+    It would be great to extend it to $\ell_1$, but in the series of papers~\cite{BC05}, \cite{LN04}, \cite{ACNN11},
+    \cite{R11a} it was proved that one needs dimension to be essentially linear in $n$. Nevertheless, in~\cite{T90}
+    it was proved that one can reduce dimension to $O(n \log n / \eps^2)$. Using spectral sparsification one can sharpen
+    this bound to $O(n / \eps^2)$ (see~\cite{N11} for the exposition).
+
+    \XComment{
     \section{Introduction}
     We survey two sparsification procedures for undirected graphs that respect
     (to some extent) values of flows and cuts.
@@ -203,6 +286,7 @@
 
     \subsection{Sparsifiers with linear number of edges}
     \cite{BSS09}
+    }
 
     \section{Spectral Sparsification}
 
