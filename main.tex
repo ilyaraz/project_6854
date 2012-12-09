@@ -109,11 +109,35 @@
     it was proved that one can reduce dimension to $O(n \log n / \eps^2)$. Using spectral sparsification one can sharpen
     this bound to $O(n / \eps^2)$ (see~\cite{N11} for the exposition).
 
-    \section{Spectral Sparsification}
+    \subsection{Organization of the report}
 
-    \subsection{Preliminaries}
+    Our report is organized as follows. First, in Section~\ref{linear_algebra} we review the definitions and the results
+    we will need further. Then, in Section~\ref{reduction_unity} we show how to reduce the problem of Laplacian
+    sparsification to the following clean linear-algebraic problem.
+    \begin{problem}[Sparsification of a decomposition of identity]
+        Let $q_1, q_2, \ldots, q_m$ be the set of vectors from $\mathbb{R}^n$ such that
+        \begin{equation}
+            \label{identity_decomposition}
+            \sum_{i=1}^m q_i q_i^t = I.
+        \end{equation}
+        Let $\eps > 0$ be some parameter. We want to sparsify~(\ref{identity_decomposition}): find $N \ll m$ and
+        the numbers $\alpha_1, \alpha_2, \ldots, \alpha_m \geq 0$ such that there are at most $N$ non-zero
+        $\alpha$'s and all the eigenvalues of $\sum_i \alpha_i q_i q_i^t$ are within $[1 - \eps; 1 + \eps]$.
 
-    \subsubsection{Linear Algebra 101}
+        What is the smallest $N = N(n, \eps)$ can we guarantee?
+    \end{problem}
+
+    In Section~\ref{resistances} we show the solution for this problem from~\cite{SS11} that is based on sampling
+    (it turns out that one should sample $q_i$'s with probabilities proportional to $\|q_i\|_2^2$)
+    and gives $N = O(n \log n / \eps^2)$, in Section~\ref{iterative} we show the ``deterministic'' approach of
+    $\cite{BSS09}$ that gives $N = O(n / \eps^2)$.
+
+    For clarity we assume that we want to sparsify an unweighted graph.
+
+    \section{Preliminaries}
+    \label{linear_algebra}
+
+    \subsection{Linear Algebra 101}
 
     Let $A \in \mathbb{R}^{n \times n}$ be a symmetric matrix. 
     \begin{theorem}[Eigendecomposition]
@@ -173,6 +197,55 @@
     For symmetric matrices spectral norm is just the maximum absolute value of an eigenvalue.
     If $I$ is the identity matrix, then $\|A - I\|_2 \leq \eps$ iff all the eigenvalues of
     $A$ lie within $[1 - \eps; 1 + \eps]$.
+
+    We will need the following ``law of large numbers'' for matrix-valued random variables proved by Rudelson and Vershynin
+    in~\cite{R96}, \cite{RV07}.
+    \begin{theorem}
+        \label{rv_inequality}
+        Let $y$ be an $n$-dimensional vector-valued random variable.
+        Suppose that $\|y\|_2 \leq M$ with probability $1$ and
+        $\|\mathbf{E}[yy^t]\|_2 \leq 1$. Then,
+        \begin{equation}
+            \label{rv_formula}
+            \mathbf{E}\left[\left\|\frac{1}{N} \sum_{i = 1}^{N} y_i y_i^t - \mathbf{E}[y_i y_i^t]\right\|_2\right]
+            \leq O\left(M \sqrt{\frac{\log N}{N}}\right),
+        \end{equation}
+        where $y_i$ -- independent copies of $y$.
+    \end{theorem}
+
+    We need the following two identities for the so-called rank-$1$ updates.
+
+    \begin{theorem}[Sherman-Morrison formula]
+        If $A$ is square and invertible and $v^tA^{-1}u \ne -1$, then
+        $$
+            (A + uv^t)^{-1} = A^{-1} - \frac{A^{-1}uv^tA^{-1}}{1 + v^tA^{-1}u}.
+        $$
+    \end{theorem}
+
+    \begin{theorem}[Matrix Determinant Lemma]
+        If $A$ is square and invertible, then
+        $$
+            \mathrm{det}(A + uv^t) = (1 + v^tA^{-1}u) \mathrm{det}(A).
+        $$
+    \end{theorem}
+
+    \subsection{Graph Laplacian}
+
+    \section{Reduction to Sparsification of a Decomposition of Identity}
+    \label{reduction_unity}
+
+    \section{Sparsification by Sampling}
+    \label{resistances}
+
+    \section{Iterative Sparsification}
+    \label{iterative}
+
+    \section{Spectral Sparsification}
+
+    \subsection{Preliminaries}
+
+    \subsubsection{Linear Algebra 101}
+
 
     \subsubsection{Graph Laplacian}
 
