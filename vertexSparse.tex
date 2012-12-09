@@ -1,0 +1,145 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+%\usepackage{fullpage}
+%\usepackage[utf8]{inputenc}
+%\usepackage{hyperref}
+%\usepackage{ccfonts}
+%\usepackage[T1]{fontenc}
+
+\renewcommand{\bfdefault}{sbc}
+
+\newcommand{\Rbb}{\mathbb{R}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\set}[1]{\left\{#1\right\}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem{problem}{Problem}
+
+\begin{document}
+    \title{Edge and Vertex Sparsification of Undirected Graphs}
+    \date{}
+    \maketitle
+
+    \subsection{Introduction to Vertex Sparsification}
+    
+%% Overview/Motivation
+    
+    Vertex sparsifiers, as the name suggests, reduces the number of vertices in the graph while preserving certain desired properties. Specifically, we assume that we only care about a certain subset of the vertices $K \subset V$, which we refer to as ``terminals''. Vertex sparsifiers are applicable to a variety of problem such as multicommodity flow problems, where we want to route multiple items between different source and sink terminals. If we needed to solve multiple multicommodity flow problems, we could first sparsify the graph, and then subsequently solve each of the flow problems over the smaller graph, achieving an amortized time cost dependent only on the total number of terminal vertices rather than the vertices in the entire graph. We look at two notions of vertex sparsifiers here: cut sparsifiers and flow sparsifiers.
+    
+    \subsubsection{Vertex Cut Sparsifiers}
+    
+%% Cut Sparsifiers
+    
+    Assume we are given an undirected graph $G = (V,E)$ and a subset $K$ of nodes that we are interested in. Let $\delta_G(A) \subset E$ denote the set of edges in $G$ in the cut $\{A, V \setminus A \}$. The cut function of $G$ is defined as follows:
+    \[h_G(A) = \sum_{e \in \delta(A)} c(e)\]
+    The terminal cut function on K is defined as:
+    \[h'(U) = \min_{a \in V s.t. A \cap K = U} h_G(A)\]
+    In words, the terminal cut value of $U \subset K$ is the minimum cut over graph $G$ that separates subsets $A$ and $K \ A$. The goal of vertex cut sparsification is to find a graph $H = (K, E_H)$ over the terminal vertices such that the cut function over $H$ upper bounds the terminal cut function.
+    \begin{definition}
+    Graph $H$ is a quality $\alpha$ vertex cut sparsifier if for all $U \subset K$, the cut value of $U$ over graph $H$ is within an $\alpha$ upper bound of the terminal cut value of $U$ over graph $G$.
+    \[1 \leq \frac{h_H(U)}{h'(U)} \leq \alpha\]
+    \end{definition}
+    Note again that a key difference between this notion of a vertex cut sparsifier and the previous notion of cut sparsifer is two fold. First of all, we are not sparsifying edges, but rather reducing the number of nodes. In fact the resulting graph could introduce new edges and result in a dense graph over the $K$ nodes. Second, instead of approximating the cut within some $(1 \pm \epsilon)$ factor, a vertex cut sparsifier must strictly upper bound the cut withing some $\alpha$ factor.
+    
+    \subsubsection{Vertex Flow Sparsifiers and Maximum Concurrent Flow Problem}
+    
+%% Flow Sparsifiers
+
+		In this section, we present a generalization of cut sparsifiers, termed flow sparsifiers. A vertex flow sparsifier is a graph $H = (K, E_H)$ over a subset of the original vertices $V$, that approximately preserves the congestion of every multicommodity flow with endpoints spported in $K$. To fully define a vertex flow sparsifier, we first define the maximum concurrent flow problem, which is also a useful concrete application that illustrates the utility of vertex sparsifiers.
+		
+		Assume we are given an undirected graph $G = (V,E)$, a capacity function $c: E \rightarrow \mathbb{R}_+$ that assigns a non-negative capacity to each edge, and a set of demands $D = \{(s_i,t_i,d_i)\}$. Each $i$ can be thought of as a commodity such that $d_i$ units of $i$ need to be routed from source $s_i$ to sink $t_i$. Set $K = \cup_i \{s_i, t_i\}$, such that set $K$ contains only nodes that are either source or sink for a commodity. The maximum concurrent flow question asks for the largest $\lambda$ such that $\lambda$ fraction of each demand $d_i$ can be simultaneously satisfied while obeying the capacity constraints. We can formulate this with the following linear program.
+		\begin{align*}
+		\lambda^*(D) = &\max \lambda \\
+		&~~\text{s.t} ~~\forall i, \sum_{p \in P_{s_i,t_i}} x(p) \geq \lambda d_i \\ %% over all paths for each item
+		&~~~~~~\forall e, ~~\sum_{p \ni e} x(p) \leq c(e) \\ %% over all paths crossing this edge
+		&~~~~~~\forall p, ~~x(p) \geq 0 %% paths
+		\end{align*}
+		Then we define congestion as $cong(D) = \frac{1}{\lambda^*}$.
+		\begin{definition}
+		Graph $H = (K,E_H)$ is a quality $\alpha$ vertex flow sparsifier if for all demands $D$,
+    \[1 \leq \frac{\lambda^*_H(D)}{\lambda^*_G(D)} \leq \alpha\]
+		\end{definition}
+		In words, for any demand $D = \{(s_i, t_i, d_i)\}$ such that the terminals $s_i, t_i$ are contained withing $K$, the vertex flow sparsifier $H$ can concurrently satisfy a larger fraction of the demand than graph $G$, within a factor of $\alpha$.
+		
+%HIGHLIGHT?!		
+%		
+%Why is this an interesting problem?? Make some comments about applications and stuff ... put together some pictures??? Ideally we want the complexity and performance to only scale with $k$, and not with $n$, such that if we have a very very large graph, but are only considered with a very small piece of it, the computation is still provably fast.    
+%
+%\subsubsection{Comparing Vertex and Spectral Sparsifiers}
+%
+%%% Contrast with spectral sparsifiers ???
+%
+%    Contrast
+%    Part 1
+%     - sparsify edges
+%     - approximation of cuts/spectrum of Laplacian   
+%    
+%    Part 2
+%     - sparsify vertices (can add edges etc)
+%     - upper bound cuts and flow congestions
+
+\subsubsection{Main Results}
+
+%% Theorem Statements
+
+%% Flow sparsifiers are strictly stronger than cut sparsifiers
+
+		\begin{theorem}
+        %% \label{flow_cut}
+        Given an $\alpha$-quality vertex flow sparsifier $H = (K, E_H)$ for a capacitated graph $G = (V,E)$, $H$ is also an $\alpha$-quality vertex cut sparsifier for $G$.
+    \end{theorem}
+
+		This theorem proves that flow sparsifiers are strictly stronger and more general than cut sparsifiers. The theorem follows from a simple application of the max-flow min-cut theorem.
+    
+    \begin{theorem}
+        %% \label{flow_existence}
+        For any capacitated graph $G = (V,E)$, for any set $K \subset V$ such that $|K| = k$, there is an $O(\log k / \log \log k)$-quality vertex flow sparsifier $H = (K, E_H)$.
+    \end{theorem}
+    
+    Note that this theorem also implies that there always exists a $O(\log k / \log \log k)$-quality vertex cut sparsifier. This theorem is proved by setting up a two player game, such that the bounds for the game value imply bounds on the quality of a vertex flow sparsifier. This proof is built on the 0-extension problem.
+    
+    %% ??? two player game with 0-extension and flows
+    %% huh?? also mention approximations of the 0-extension problem
+    
+    \begin{theorem}
+        %% \label{flow_algorithm}
+        For any capacitated graph $G = (V,E)$, for any set $K \subset V$ such that $|K| = k$, there is an algorithm that computes an $O(\log k / \log \log k)$-quality flow-sparsifier $H = (K, E_H)$ in time $\tilde{O}(km^2)$ where $m = |E|$.
+    \end{theorem}
+
+    This algorithm is based on using the ellipsoid algorithm. Vertex sparsification is written as a linear program, and separation oracles are defined for the different constraints. However, solving the problem exactly in NP-hard, therefore we relax the linear program and also use approximations for some of the constraints.
+    
+    %%Formulate a linear program and find oracle separators? that find violated constraints ...
+%% uhhhhh ... should I/do I need to ... show lower bounds??
+
+%% Conclusion??
+
+%To highlight, the goal is to construct these sparsifiers with algorithms that have runtime only dependent on $k$, and not dependent on $n$. And also to find approximations with quality only dependent on $k$ not $n$. Thus, a variety of routing-based problems can be solved efficiently in the regime where $n >> k$.
+    
+    %% NONONO ... the runtime is polynomial in $n,k$ .... or in $m,k$
+    
+    \section{Proving Existence of a ``Good'' Vertex Flow Sparsifier}
+    
+%% Existential Arguments
+
+\subsection{0-extension problem}
+
+%% 0-extension problem
+
+\section{Constructing a ``Good'' Vertex Flow Sparsifier}
+
+%% Construction Algorithm
+
+%Given a graph $H$ guaranteed to be a flow sparsifier, determining the quality of H can be formulated as a single minimum congestion routing problem.
+
+%In an amortized sense, we can compute approximate minimum congestion routings for a sequence of demand vectors in G in time polynomial in the number of terminals (independent of size of original graph).
+
+%% Applications
+    
+    \bibliographystyle{alpha}
+    \bibliography{ir}
+\end{document}
