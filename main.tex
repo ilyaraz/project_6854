@@ -23,7 +23,7 @@
 
 \begin{document}
     \title{Spectral Sparsification of Undirected Graphs}
-    \author{Ilya Razenshteyn\\CSAIL, MIT\\\texttt{ilyaraz@mit.edu}}
+    \author{Ilya Razenshteyn\\\texttt{ilyaraz@mit.edu}}
     \maketitle
 
     \section{Introduction}
@@ -79,7 +79,8 @@
     But we require much more: to preserve $\mathcal{L}_G(x)$ for every $x$, not only for the indicators.
 
     We will survey two constructions of spectral sparsifiers. The first is from~\cite{SS11}, which gives sparsifiers
-    with $O(n \log n / \eps^2)$ matching the bound of Theorem~\ref{benczur_karger}. Moreover, these sparsifiers can be found
+    with $O(n \log n / \eps^2)$ edges
+    matching the bound of Theorem~\ref{benczur_karger}. Moreover, these sparsifiers can be found
     in near-linear time. The second construction is from~\cite{BSS09}: it gives sparsifiers with $O(n / \eps^2)$ edges,
     but the algorithm for building them is much slower (nevertheless, even the existance of near-linear-sized spectral
     sparsifiers is higly non-trivial).
@@ -101,9 +102,10 @@
     The classic theorem of Johnson--Lindenstrauss~\cite{DG03}
     says that if we have $n$ vectors in $\mathbb{R}^d$, then we can map them into $\mathbb{R}^{O(\log n / \eps^2)}$
     so that to $(1\pm\eps)$-preserve their pairwise $\ell_2$-distances.
-    This theorem has immense number of applications (in particular, we will use to find spectral sparsifiers quickly).
+    This theorem has immense number of applications (in particular, we will use it to find spectral sparsifiers quickly).
     It would be great to extend it to $\ell_1$, but in the series of papers~\cite{BC05}, \cite{LN04}, \cite{ACNN11},
-    \cite{R11a} it was proved that one needs dimension to be essentially linear in $n$. Nevertheless, in~\cite{T90}
+    \cite{R11a} it was proved that one needs dimension to be essentially linear in $n$ in this case.
+    Nevertheless, in~\cite{T90}
     it was proved that one can reduce dimension to $O(n \log n / \eps^2)$. Using spectral sparsification one can sharpen
     this bound to $O(n / \eps^2)$ (see~\cite{N11} for the exposition).
 
