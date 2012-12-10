@@ -461,6 +461,12 @@
         one can show that $\sum_j \sigma(q_j) \geq 1 / \delta_L - \eps_L$. The desired inequality follows.
     \end{proof}
 
+    So, the final algorithm is the following: on each step we compute $\sigma(q_j)$ and $\tau(q_j)$ for every
+    $j$, and choose $j$ such that $\tau(q_j) \leq \sigma(q_j)$. Then choose $\alpha$ such that
+    $\tau(q_j) \leq 1 / \alpha \leq \sigma(q_j)$, and set $A_i := A_{i-1} + \alpha q_j q_j^t$.
+    We repeat this process until all the eigenvalues of $A_i$ are within $(1 \pm \eps)$ of each other, and then do a
+    normalization.
+
     \section{Acknowledgements}
 
     I am very thankful to Richard Peng for enlightening discussions.
