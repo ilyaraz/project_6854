@@ -132,12 +132,10 @@
     and gives $N = O(n \log n / \eps^2)$, in Section~\ref{iterative} we show the ``deterministic'' approach of
     $\cite{BSS09}$ that gives $N = O(n / \eps^2)$.
 
-    For clarity we assume that we want to sparsify an unweighted graph.
+    For clarity we assume that we want to sparsify an unweighted connected graph.
 
     \section{Preliminaries}
     \label{linear_algebra}
-
-    \subsection{Linear Algebra 101}
 
     Let $A \in \mathbb{R}^{n \times n}$ be a symmetric matrix. 
     \begin{theorem}[Eigendecomposition]
@@ -229,10 +227,53 @@
         $$
     \end{theorem}
 
-    \subsection{Graph Laplacian}
-
     \section{Reduction to Sparsification of a Decomposition of Identity}
     \label{reduction_unity}
+
+    If $G$ is an undirected unweighted graph, then, clearly
+    $$
+        \mathcal{L}_G(x) = x^t L x,
+    $$
+    where $L_{vv}$ equals to the degree of $v$, $L_{vw} = -1$, if $(v, w) \in E$, and
+    $L_{vw} = 0$, otherwise.
+
+    Clearly, $\mathbf{1} \in \mathrm{ker}(L)$. Moreover, it is easy to prove that
+    $\mathrm{ker}(L) = \langle \mathbf{1} \rangle$ iff $G$ is connected.
+    In this case $\mathrm{im}(L) = \langle\mathbf{1}\rangle^{\perp}$.
+
+    We have the following natural rank-$1$ decomposition of $L$:
+    \begin{equation}
+        \label{ldec}
+        L = \sum_{(v, w) \in E} (e_v - e_w) (e_v - e_w)^t.
+    \end{equation}
+
+    Now let us understand what does it mean for a graph $\tilde{G}$ to approximate
+    $G$ in the sense of Laplacian. Let us denote $\tilde{L}$ the Laplacian of $G$.
+    We want that for every $x \in \Rbb^n$
+    \begin{equation}
+        \label{app}
+        x^t \tilde{L} x \in (1 \pm \eps) x^t L x.
+    \end{equation}
+    Clearly, if $x \in \mathrm{ker}(L)$, then there is nothing to worry about, since
+    both sides of~(\ref{app}) are equal to zero. So, it is only left to ensure
+    that~(\ref{app}) holds for $x \in \mathrm{im}(L)$.
+    In this case we can write $x = (L^+)^{1/2} y$ for
+    $y = L^{1/2} x \in \mathrm{im}(L)$.
+    Thus, we want that for every $y \in \mathrm{im}(L)$
+    $$
+        y^t (L^+)^{1/2} \tilde{L} (L^+)^{1/2} y \in (1 \pm \eps) y^t y.
+    $$
+    It is equivalent to
+    $$
+        \|(L^+)^{1/2} \tilde{L} (L^+)^{1/2} - I_{\mathrm{im}(L)}\|_2 \leq \eps.
+    $$
+    But this is exactly an instance of Problem~\ref{identity_decomposition} for
+    the the following decomposition:
+    $$
+        I_{\mathrm{im}(L)} = (L^+)^{1/2} L (L^+)^{1/2} = \sum_{(v,w) \in E} q_{vw} q_{vw}^t,
+    $$
+    where $q_{vw} = (L^+)^{1/2} (e_v - e_w)$ (we pass from $\mathrm{R}^n$ to
+    $\mathrm{im}(L) = \langle \mathbf{1} \rangle^{\perp}$ here, we also use~(\ref{ldec})).
 
     \section{Sparsification by Sampling}
     \label{resistances}
