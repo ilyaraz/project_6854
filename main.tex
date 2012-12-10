@@ -54,7 +54,7 @@
     The proof of Theorem~\ref{benczur_karger} goes along the following lines. The first naive idea is to employ uniform
     random sampling (in case of unweighted graphs).
     It turns out that one can prove that it works, provided that the minimum cut is large enough.
-    To overcome this problem with small cuts one has to sample edges with probabilities proportional to their
+    To overcome this problem with small cuts one has to sample edges with probabilities inversely proportional to their
     \emph{strong connectivities}.
 
     In~\cite{ST11} Spielman and Teng considered a singificantly stronger notion of sparsification: the so called
@@ -211,19 +211,13 @@
         where $y_i$ -- independent copies of $y$.
     \end{theorem}
 
-    We need the following two identities for the so-called rank-$1$ updates.
+    We need the following peculiar identity for the so-called rank-$1$ updates.
 
     \begin{theorem}[Sherman-Morrison formula]
+        \label{sherman_morrison}
         If $A$ is square and invertible and $v^tA^{-1}u \ne -1$, then
         $$
             (A + uv^t)^{-1} = A^{-1} - \frac{A^{-1}uv^tA^{-1}}{1 + v^tA^{-1}u}.
-        $$
-    \end{theorem}
-
-    \begin{theorem}[Matrix Determinant Lemma]
-        If $A$ is square and invertible, then
-        $$
-            \mathrm{det}(A + uv^t) = (1 + v^tA^{-1}u) \mathrm{det}(A).
         $$
     \end{theorem}
 
@@ -307,7 +301,8 @@
 
     \textbf{Remark:} suprisingly enough, it turns out that for the graph Laplacian case
     $\|q_{vw}\|_2^2$ is equal to the effetive resistance of an edge $(v, w)$.
-    This intuition is heavily used in several recent developments.
+    This intuition is heavily used in several recent developments. Futhermore, there is a strong similarity between this
+    sparsification procedure and that of from~\cite{BK96}: effective resistances reflect edge connectivities.
 
     \subsection{Near-linear Time Algorithm (a High-Level Idea)}
 
@@ -345,133 +340,126 @@
     \section{Iterative Sparsification}
     \label{iterative}
 
-    \subsection{Iterative Sparsification}
-
-    Unlike~\cite{SS11}, a completely different approach for solving Problem~\ref{spu}
-    is used in~\cite{BSS09}.
-    If in the RHS of~\ref{rv_formula} there were not $\sqrt{\log N}$ factor, the exactly
-    the same sampling procedure would give sparsifiers with $O(n / \eps^2)$ terms.
-    Unfortunately, this factor is unavoidable.
-    If $y$ is a random basis vector, then, clearly, we need at least $\Omega(n \log n)$
-    samples to choose each vector at least once.
-    Thus, no matter what probabilities do we use for (independent) sampling, we can not
+    To improve the bound $O(n \log n / \eps^2)$ one should switch from (independent) edge sampling to something else.
+    The reason is that in Theorem~\ref{rv_inequality} the factor $\sqrt{\log N}$ is essential: consider the case,
+    when $y$ is a random basis vector. Then, clearly, we need at least $\Omega(n \log n)$ samples to choose each
+    vector at least once. Thus, no matter what probabilities are we using for independent edge sampling, we can not
     overcome the bound $O(n \log n)$.
+    So, to get the optimal $O(n / \eps^2)$ bound one has to use ``deterministic'' methods.
 
-    So, to get the optimal $O(n / \eps^2)$ one has to use ``deterministic'' methods.
-    We will use the iterative approach: on each step we keep track to a current approximation
-    $A$ of the identity, and update $A$ by adding a multiple $\alpha q_i q_i^t$ for some
-    carefully chosen $\alpha$ and $i$ (this update procedure is called rank-$1$ update).
-    Since we want that our resulting matrix to have all eigenvalues within
-    $[1 - \eps; 1 + \eps]$, let us first study how eigenvalues behave under rank-$1$
-    updates.
+    We will use the iterative approach: on each step we keep track of a current matrix $A$
+    and perform a rank-$1$ update of it --- set $A := A + \alpha q_j q_j^t$ for some carefully chosen $\alpha \geq 0$ and
+    $j \in [m]$. Our goal is that the eigenvalues of $A$ are within $(1 \pm \eps)$ of each other.
 
-    Since the trace of a matrix equals to the sum of its eigenvalues we see that if
-    we increase $A$ by $vv^t$, then the sum of eigenvalues increases by $\|v\|_2^2$.
-    So, ``on average'' every eigenvalue increases by $\|v\|_2^2 / n$.
-    If we managed to get many of such ``uniform'' increases, then we would have been done:
-    after some time all eigenvalues will be within $(1 \pm \eps)$ of each other, so after
-    the proper normalization they will be within $[1 - \eps; 1 + \eps]$.
+    Since $\mathrm{tr}(A + vv^t) = \mathrm{tr}(A) + \|v\|_2^2$, the eigenvalues of $A$ increase by
+    $\|v\|_2^2 / n$ ``on average''. If all the eigenvalues always increase by the same amount, we are done: after some time
+    all of them will be close to each other.
+    Unfortunately, we are not guaranteed to have ``uniform'' increases.
 
-    Unfortunately, there is no guarantee that all eigenvalues will be increased by
-    (approximately) the same amount.
-    Here comes the brilliant idea of Batson, Spielman, and Srivastava~\cite{BSS09}.
-    They consider the following ``barrier'' potential functions which allow us to conclude
-    that all eigenvalues grow on a steady pace.
+    Here comes the brilliant idea of Batson, Spielman and Srivastava~\cite{BSS09}.
+    They consider the following ``barrier'' potential functions, which will allow us to control the pace of eigenvalues'
+    growth.
 
     \begin{definition}
-        Let use denote by $\lambda_1, \lambda_2, \ldots, \lambda_n$ the eigenvalues of
-        a square matrix $A$. Then,
+        Let $A$ be a square matrix. Then
         \begin{eqnarray*}
-            L_{x}(A) &:=& \sum_{i} \frac{1}{\lambda_i - x}; \\
-            U_{x}(A) &:=& \sum_{i} \frac{1}{x - \lambda_i}.
+            L_x(A) &=& \mathrm{tr}(A - xI)^{-1} = \sum_i \frac{1}{\lambda_i(A) - x}\\
+            U_x(A) &=& \mathrm{tr}(xI - A)^{-1} = \sum_i \frac{1}{x - \lambda_i(A)}\\
         \end{eqnarray*}
-        Let us call $L_x(A)$ \emph{lower barrier} and $U_x(A)$~--- upper barrier,
-        respectively.
     \end{definition}
 
-    Clearly, $L_x(A)$ is increasing in $x$ and $U_x(A)$ is, on the other hand, decreasing.
-    These barriers blow up, whenever $x$ equals to some eigenvalue.
+    The idea of~\cite{BSS09} is to maintain $l$ and $u$ such that $L_l(A)$ and $U_u(A)$ are small, and all the eigenvalues are
+    within $(l; u)$, which will allow us
+    to conclude that we can perform a rank-$1$ update to $A$ and increase $l$ and $u$ by certain amounts.
 
-    The overall strategy for sparsification will be the following:
-    let $\eps_L > 0$, $\eps_U > 0$, $\delta_L > 0$, $\delta_U > 0$, $l_0$, $u_0$ be some
-    constants. We have the successive approximations $A_0, A_1, \ldots, A_N$ such that
+    More formally, let $\delta_L, \delta_U, \eps_L, \eps_U, l_0, u_0$ be some parameters, moreover,
+    $\delta_L, \delta_U, \eps_L, \eps_U$ are positive.
+    We build a sequence of matrices $A_0, A_1, \ldots, A_N$ such that
     \begin{itemize}
         \item $A_0 = 0$;
-        \item $A_i = A_{i-1} + \alpha q_j q_j^t$ for some $\alpha \geq 0$ and $j \in [m]$;
-        \item $L_{l_0 + i \cdot \delta_L}(A_i) \leq L_{l_0 +
-            (i - 1) \cdot \delta_L}(A_{i-1})
-              \leq \eps_L$;
-        \item $R_{r_0 + i \cdot \delta_R}(A_i) \leq R_{r_0 +
-            (i - 1) \cdot \delta_R}(A_{i-1})
-              \leq \eps_R$;
-        \item all eigenvalues of $A_i$ are within $(l_0 + i \cdot \delta_L; r_0 + i \cdot
-              \delta_R)$.
+        \item $A_i = A_{i-1} + \alpha q_j q_j^t$ for some $\alpha > 0$ and $j \in [m]$;
+        \item $L_{l_i}(A_i) \leq L_{l_{i-1}}(A_{i-1}) \leq \eps_L$, where $l_i = l_0 + i \cdot \delta_L$;
+        \item $U_{u_i}(A_i) \leq U_{u_{i-1}}(A_{i-1}) \leq \eps_U$, where $u_i = u_0 + i \cdot \delta_U$;
+        \item all the eigenvalues of $A_i$ lie within $(l_i; u_i)$.
     \end{itemize}
+    We will show that for these invariants to hold it is sufficient for the following relations to hold.
+    \begin{itemize}
+        \item $\eps_L = -n / l_0$, $\eps_U = n / u_0$;
+        \item $1 / \delta_U + \eps_U \leq 1 / \delta_L - \eps_L$;
+        \item $\eps_L \leq 1 / \delta_L$.
+    \end{itemize}
+    One can see that we can take $\eps_L = \Theta(\eps)$, $\eps_U = \Theta(\eps)$, $\delta_L = 1$,
+    $\delta_U = 1 + \Theta(\eps)$, $l_0 = -\Theta(n / \eps)$, $u_0 = \Theta(n / \eps)$ and get a desired sparsifier
+    after $O(n / \eps^2)$ steps.
 
-    In the end of the day we will choose the parameters as follows: $\delta_L = 1$,
-    $\delta_R = 1 + \Theta(\eps)$, $l_0 = -\Theta(n / \eps)$, $r_0 = \Theta(n / \eps)$.
-    Clearly, it implies that after $O(n / \eps^2)$ steps all the eigenvalues will be
-    within $(1 \pm \eps)$ of each other, so we are done.
+    Suppose we want to set $A_i = A_{i-1} + \alpha vv^t$. As a simple consequence of Theorem~\ref{sherman_morrison} we
+    get the following formulae.
+    \begin{eqnarray*}
+        L_{l_i}(A_i) &=& L_{l_i}(A_{i-1}) - \frac{v^t (A_{i-1} - l_iI)^{-2} v}{1 / \alpha + v^t (A_{i-1} - l_i I)^{-1} v}\\
+        U_{u_i}(A_i) &=& U_{u_i}(A_{i-1}) + \frac{v^t (u_iI - A_{i-1})^{-2} v}{1 / \alpha - v^t (u_iI - A_{i-1})^{-1} v}\\
+    \end{eqnarray*}
 
-    The main question is, of course, how to choose $\alpha$ and $q_j$ to maintain all the
-    invariants. The plan of the argument is the following: first, we derive
-    (rather ugly looking) conditions on $j$ that imply that there exists an $\alpha$ such
-    that if we set $A_i := A_{i-1} + \alpha q_j q_j^t$, then all the invariants will be
-    maintained. Then, we prove that if we choose $j$ uniformly at random, then
-    ``on expectation'' these conditions will hold.
-    On the algorithmic side it implies that we can try all possible $j$'s and choose the
-    one that works.
-
-    So, suppose we want to set $A_i := A_{i-1} + \alpha q_j q_j^t$ for some $\alpha \geq 0$
-    and $j \in [m]$. The next Lemma quantifies what $\alpha$ we should choose so that
-    $L_{l_0 + i \cdot \delta_L}(A_i) \leq L_{l_0 + (i - 1) \cdot \delta_L}(A_{i-1})$
-    and $R_{r_0 + i \cdot \delta_R}(A_i) \leq R_{r_0 + (i - 1) \cdot \delta_R}(A_{i-1})$.
-
-    For compactness let us denote $l_i := l_0 + i \cdot \delta_L$,
-    $r_i := r_0 + i \cdot \delta_R$.
+    Using these formulae it is straightforward to prove the following Lemmas.
 
     \begin{lemma}
-      $L_{l_i}(A_i) \leq L_{l_{i-1}}(A_{i-1})$
-      iff
-      $$
-        0 < \frac{1}{\alpha} \leq -q_j^t (A_{i-1} - l_i I)^{-1} q_j +
-        \frac{q_j^t (A_{i-1} - l_i I)^{-2}q_j}{L_{l_i}(A_{i-1}) - L_{l_{i-1}}(A_{i-1})}
-        =: \sigma(j).
-      $$
-      $R_{r_i}(A_i) \leq R_{r_{i-1}}(A_{i-1})$ iff
-      $$
-        \frac{1}{\alpha} \geq q_j^t (r_i I - A_{i-1})^{-1} q_j +
-        \frac{q_j^t (r_i I - A_{i-1})^{-2} q_j}{R_{r_{i-1}}(A_{i-1}) - R_{r_i}(A_{i-1})}
-        =: \tau(j). 
-      $$
+        \label{lower_shift}
+        $L_{l_i}(A_i) \leq L_{l_{i-1}}(A_{i-1})$ iff
+        $$
+            0 < \frac{1}{\alpha} \leq \sigma(v) := -v^t(A_{i-1}-l_iI)^{-1}v +
+            \frac{v^t(A_{i-1}-l_iI)^{-2}v}{L_{l_i}(A_{i-1}) - L_{l_{i-1}}(A_{i-1})}.
+        $$
     \end{lemma}
+
+    \begin{lemma}
+        \label{upper_shift}
+        $U_{u_i}(A_i) \leq U_{u_{i-1}}(A_{i-1})$ iff
+        $$
+            \frac{1}{\alpha} \geq \tau(v) := v^t(u_iI - A_{i-1})^{-1}v +
+            \frac{v^t(u_iI - A_{i-1})^{-2}v}{U_{u_{i-1}}(A_{i-1}) - U_{u_i}(A_{i-1})}.
+        $$
+    \end{lemma}
+
+    As a result we prove the following Theorem.
+    \begin{theorem}
+        If $\tau(v) \leq \sigma(v)$, then there exists an $\alpha > 0$ such that if we set $A_i := A_{i-1} + \alpha vv^t$,
+        then
+        \begin{itemize}
+            \item $L_{l_i}(A_i) \leq L_{l_{i-1}}(A_{i-1})$;
+            \item $U_{u_i}(A_i) \leq U_{u_{i-1}}(A_{i-1})$;
+            \item all the eigenvalues of $A_i$ are within $(l_i; u_i)$.
+        \end{itemize}
+    \end{theorem}
     \begin{proof}
-        \footnote{TODO!!!!!}
+        The first and the second statement are trivial corollaries of Lemma~\ref{lower_shift} and~\ref{upper_shift}.
+        Thus, it is left to argue about eigenvalues.
+        Clearly, all the eigenvalues of $A_{i-1}$ (and, thus, of $A_i$) are at least
+        $l_{i-1} + 1 / \eps_L \leq l_{i-1} + \delta_L = l_i$, because $L_{l_{i-1}}(A_{i-1}) \leq \eps_L$.
+        Since $L_{l_i}(A_i)$ is finite, we have that all eigenvalues of $A_i$ are strictly greater than $l_i$.
+        Now let us argue about the upper bound. From Lemma~\ref{upper_shift} it follows that if $\alpha$ is sufficiently
+        small, then $U_{u_i}(A_i)$ is finite (and even small). If the largest eigenvalue of $A_i$ is at least $u_i$,
+        it means that for some small $\alpha$ $U_{u_i}(A_i)$ blows up, thus we have a contradiction.
     \end{proof}
 
-    Argue about eigenvalues!!!!
-    
-    Now it is left to prove that we can choose the parameters such that on every 
-    iteration there exists
-    $j \in [m]$ such that $\sigma(j) \geq \tau(j)$.
-    We do this using the averaging argument. We show that one choose the parameters such
-    that $\sum_j \sigma(j) \geq \sum_j \tau(j)$.
+    Now it is left to prove that there exists $j \in [m]$ such that $\tau(q_j) \leq \sigma(q_j)$.
+    For this we prove the following theorem.
 
-    We have
-    \begin{eqnarray*}
-        \sum_j \sigma(j) &=& -\sum_t \frac{1}{\lambda_t - l_i} +
-        \frac{\sum_t \frac{1}{(\lambda_t - l_i)^2}}
-        {\sum_t \frac{1}{\lambda_t - l_i} - \sum_t \frac{1}{\lambda_t - l_{i-1}}};\\ 
-        \sum_j \tau(j) &=& \sum_t \frac{1}{r_i - \lambda_t} +
-        \frac{\sum_t \frac{1}{(r_i - \lambda_t)^2}}
-        {\sum_t \frac{1}{r_{i-1} - \lambda_t} - \sum_t \frac{1}{r_i - \lambda_t}},\\ 
-    \end{eqnarray*}
-    where $\lambda_t$ are the eigenvalues of $A_{i-1}$.
-
-    One can prove that $\sum_j \sigma(j) \geq 1 / \delta_L - \eps_L$,
-    $\sum_j \tau(j) \leq 1 / \delta_R + \eps_R$.
-
-    \section{Vertex Sparsification}
+    \begin{theorem}
+        If $1 / \delta_U + \eps_U \leq 1 / \delta_L - \eps_L$, then
+        $$
+            \sum_j \tau(q_j) \leq \sum_j \sigma(q_j)
+        $$
+    \end{theorem}
+    \begin{proof}
+        One can prove using that
+        \begin{eqnarray*}
+            \sum_j \tau(q_j) &=& \sum_{t}(u_i - \lambda_t)^{-1} + \frac{\sum_t(u_i - \lambda_t)^{-2}}
+            {\sum_t (u_{i-1} - \lambda_t)^{-1} - \sum_t (u_i - \lambda_t)^{-1}}\\
+            \sum_j \sigma(q_j) &=& -\sum_t(\lambda_t - l_i)^{-1} + \frac{\sum_t(\lambda_t - l_i)^{-2}}
+            {\sum_t(\lambda_t - l_i)^{-1} - \sum_t(\lambda_t - l_{i-1})^{-1}}.\\
+        \end{eqnarray*}
+        One can fairly easy show that $\sum_j \tau(q_j) \leq \eps_U + 1 / \delta_U$. With some work
+        one can show that $\sum_j \sigma(q_j) \geq 1 / \delta_L - \eps_L$. The desired inequality follows.
+    \end{proof}
 
     \section{Acknowledgements}
 
