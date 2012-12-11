@@ -295,13 +295,30 @@
     $$
         \|(L^+)^{1/2} \tilde{L} (L^+)^{1/2} - I_{\mathrm{im}(L)}\|_2 \leq \eps.
     $$
-    But this is exactly an instance of Problem~\ref{identity_decomposition} for
-    the following decomposition:
+    From the definitions of pseudoinverse and the square root of a PSD matrix we have
+    \begin{equation}
+        \label{identity}
+        I_{\mathrm{im}(L)} = (L^+)^{1/2} L (L^+)^{1/2} =
+        \sum_{(v, w) \in E} (L^+)^{1/2} (e_v - e_w) (e_v - e_w)^t (L^+)^{1/2}.
+    \end{equation}
+    Since
     $$
-        I_{\mathrm{im}(L)} = (L^+)^{1/2} L (L^+)^{1/2} = \sum_{(v,w) \in E} q_{vw} q_{vw}^t,
+        \tilde{L} = \sum_{(v, w) \in E} \gamma(v, w) (e_v - e_w) (e_v - e_w)^t,
     $$
-    where $q_{vw} = (L^+)^{1/2} (e_v - e_w)$ (we pass from $\mathbb{R}^n$ to
-    $\mathrm{im}(L) = \langle \mathbf{1} \rangle^{\perp}$ here, we also use~(\ref{ldec})).
+    where $\gamma(v, w)$ is a weight we assign to the edge $(v, w)$ in $\tilde{G}$,
+    we have
+    \begin{equation}
+        \label{new_laplacian}
+        (L^+)^{1/2} \tilde{L} (L^+)^{1/2} = \sum_{(v, w) \in E}
+        \gamma(v, w) (L^+)^{1/2} (e_v - e_w) (e_v - e_w)^t (L^+)^{1/2}.
+    \end{equation}
+
+    Comparing~(\ref{identity}) and~(\ref{new_laplacian}) we can observe that we
+    are facing an instance of Problem~\ref{identity_decomposition}: first, we
+    pass from the whole $\mathbb{R}^n$ to a subspace $\langle \mathbf{1} \rangle^{\perp}$,
+    then we observe that~(\ref{identity}) is a decomposition of the identity in this
+    subspace with $q_{vw} = (L^+)^{1/2} (e_v - e_w)$,
+    and~(\ref{new_laplacian}) is exactly a sparsification of this decomposition.
 
     \section{Sparsification by Sampling}
     \label{resistances}
@@ -361,15 +378,34 @@
     so we are interested in pairwise $\ell_2$-distances between the columns of $ML^+$.
     One could compute the rows of $ML^+$ by multiplying $m$ rows of $M$ by $L^+$.
     Amazingly, there exists a way to do it in near-linear time approximately
-    (see~\cite{KMP10} for more details). Unfortunately, this is still not sufficient
+    (see~\cite{KMP10} for more details).
+    \begin{theorem}[\cite{KMP10}]
+        There is an algorithm that given $x \in \Rbb^n$ computes $y \in \Rbb^n$ such that
+        $$
+            \|y - L^+ x\|_L \leq \eps \|L^+ x\|_L,
+        $$
+        where $\|z\|_L := \sqrt{z^t L z}$, in time $\tilde{O}(m)$.
+    \end{theorem}
+    Unfortunately, this is still not sufficient
     for our purposes, because there are $m$ rows and we get $\tilde{O}(m^2)$ time in total.
 
-    Here comes into the play the celebrated result of Johnson and Lindenstrauss
-    (see~\cite{DG03} for a good exposition): if we take $Q$ to be a (properly normalized)
-    $O(\log n) \times n$ random matrix with i.i.d. Gaussian entries, then
-    the pairwise distances between the columns of $ML^+$ are approximately equal to that of
-    $QML^+$. Fortunately, we can multiply $Q$ by $M$ in time $\tilde{O}(m)$, and then
-    invoke the solver from~\cite{KMP10} only $O(\log n)$ times.
+    Here comes into the play the celebrated result of Johnson and Lindenstrauss.
+    \begin{theorem}[\cite{DG03}]
+        Let $x_1, x_2, \ldots, x_n \in \Rbb^d$ be arbitrary vectors.
+        If $Q$ is an $O(\log n / \eps^2) \times d$ matrix with (properly normalized)
+        i.i.d. Gaussian entries, then
+        $$
+            \mathbf{Pr}[\;\forall i, j \; \|Q(x_i - x_j)\|_2 \in
+            (1 \pm \eps) \|x_i - x_j\|_2] \geq 0.99.
+        $$
+    \end{theorem}
+    So, it is sufficient to compute a matrix $QML^+$. We can compute $QM$ in time
+    $O(m \log n)$, and then compute $QML^+$ by invoking the solver from~\cite{KMP10}
+    $O(\log n)$ times, thus getting the overall $\tilde{O}(m)$ running time.
+
+    \textbf{Remark:} many more details has to be filled here. For instance, what accuracy
+    do we need, when invoking the solver from~\cite{KMP10}? For complete treatment
+    see~\cite{SS11}.
 
     \section{Iterative Sparsification}
     \label{iterative}
@@ -383,11 +419,12 @@
 
     We will use the iterative approach: on each step we keep track of a current matrix $A$
     and perform a rank-$1$ update of it --- set $A := A + \alpha q_j q_j^t$ for some carefully chosen $\alpha \geq 0$ and
-    $j \in [m]$. Our goal is that the eigenvalues of $A$ are within $(1 \pm \eps)$ of each other.
+    $j \in [m]$. Our goal is that the eigenvalues of $A$ are within a multiplicative
+    factor $(1 \pm \eps)$ of each other.
 
     Since $\mathrm{tr}(A + vv^t) = \mathrm{tr}(A) + \|v\|_2^2$, the eigenvalues of $A$ increase by
     $\|v\|_2^2 / n$ ``on average''. If all the eigenvalues always increase by the same amount, we are done: after some time
-    all of them will be close to each other.
+    all of them will be close to each other (in multiplicative sense).
     Unfortunately, we are not guaranteed to have ``uniform'' increases.
 
     Here comes the brilliant idea of Batson, Spielman and Srivastava~\cite{BSS09}.
@@ -424,7 +461,11 @@
     \end{itemize}
     One can see that we can take $\eps_L = \Theta(\eps)$, $\eps_U = \Theta(\eps)$, $\delta_L = 1$,
     $\delta_U = 1 + \Theta(\eps)$, $l_0 = -\Theta(n / \eps)$, $u_0 = \Theta(n / \eps)$ and get a desired sparsifier
-    after $O(n / \eps^2)$ steps.
+    after $O(n / \eps^2)$ steps. The reason is that after $N$ steps all the eigenvalues
+    will be within $[l_0 + N \cdot \delta_L; r_0 + N \cdot \delta_R] =
+    [-\Theta(n / \eps) + N; \Theta(n / \eps) + N (1 + \Theta(\eps))]$. So, after
+    $O(n / \eps^2)$ steps all the eigenvalues are within $[N(1 - \eps); N(1 + \eps)]$.
+    After a proper normalization of $A_N$ we are done.
 
     Suppose we want to set $A_i = A_{i-1} + \alpha vv^t$. As a simple consequence of Theorem~\ref{sherman_morrison} we
     get the following formulae.
