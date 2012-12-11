@@ -439,7 +439,8 @@
         \end{eqnarray*}
     \end{definition}
 
-    The idea of~\cite{BSS09} is to maintain $l$ and $u$ such that $L_l(A)$ and $U_u(A)$ are small, and all the eigenvalues are
+    The idea of~\cite{BSS09} is to maintain two barriers
+    $l$ and $u$ such that $L_l(A)$ and $U_u(A)$ are small, and all the eigenvalues are
     within $(l; u)$, which will allow us
     to conclude that we can perform a rank-$1$ update to $A$ and increase $l$ and $u$ by certain amounts.
 
@@ -541,6 +542,12 @@
     $\tau(q_j) \leq 1 / \alpha \leq \sigma(q_j)$, and set $A_i := A_{i-1} + \alpha q_j q_j^t$.
     We repeat this process until all the eigenvalues of $A_i$ are within $(1 \pm \eps)$ of each other, and then do a
     normalization.
+
+    \section{Conclusion}
+
+    We presented two construction of spectral sparsifiers. The better of two achieves
+    the bound of $O(n / \eps^2)$ edges. One challenging open problem here is to achieve
+    the same bound for cut sparsifiers with ``combinatorial'' argument.
 
     \section{Acknowledgements}
 
