@@ -26,6 +26,29 @@
     \author{Ilya Razenshteyn\\\texttt{ilyaraz@mit.edu}}
     \maketitle
 
+    \abstract{
+
+        A cut sparsifier for an undirected graph is a sparse graph, which preserves
+        up to multiplicative $(1 \pm \eps)$ factor the values of all cuts.
+        It was shown in~\cite{BK96} how to construct cut sparsifiers with
+        $O(n \log n / \eps^2)$ edges in near-linear time. In~\cite{ST11} Spielman
+        and Teng considered much stronger notion: spectral sparsification.
+        A spectral sparsifier is a sparse graph, which (almost) preserves
+        the Laplacian of the original graph.
+
+        This report (which was written as a final project for the MIT course
+                ``Advanced Algorithms'')
+        surveys two
+        constructions of spectral sparsifiers.
+
+        The first construction is by Spielman and Srivastava~\cite{SS11}. They
+        show how to build spectral
+        sparsifiers with $O(n \log n / \eps^2)$ edges in near-linear
+        time. The second construction is by Batson, Spielman and Srivastava~\cite{BSS09}.
+        While having fewer edges ($O(n / \eps^2)$ instead of $O(n \log n / \eps^2)$),
+        these sparsifiers require much more (but still polynomial) time to construct.
+    }
+
     \section{Introduction}
 
     One recurring topic in Graph Theory is how to approximate a given graph with much sparser one while preserving certain
